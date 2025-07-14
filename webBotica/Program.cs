@@ -8,6 +8,11 @@ using webBotica2.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8090";
+
+// Configurar Kestrel antes de crear la app
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // 1. MVC + Razor
 builder.Services.AddControllersWithViews();
 
@@ -35,6 +40,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
+
 
 // ─────────────── Pipeline ───────────────
 if (!app.Environment.IsDevelopment())
