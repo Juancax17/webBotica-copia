@@ -280,5 +280,4 @@ C:\Users\HP\OneDrive\Desktop\ProyectoWeb-C#\webBotica-copia\webBotica\obj\Debug\
 C:\Users\HP\OneDrive\Desktop\ProyectoWeb-C#\webBotica-copia\webBotica\obj\Debug\net8.0\webBotica2.pdb
 C:\Users\HP\OneDrive\Desktop\ProyectoWeb-C#\webBotica-copia\webBotica\obj\Debug\net8.0\webBotica2.genruntimeconfig.cache
 C:\Users\HP\OneDrive\Desktop\ProyectoWeb-C#\webBotica-copia\webBotica\obj\Debug\net8.0\ref\webBotica2.dll
-C:\Users\HP\OneDrive\Desktop\ProyectoWeb-C#\webBotica-copia\webBotica\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\HP\OneDrive\Desktop\ProyectoWeb-C#\webBotica-copia\webBotica\obj\Debug\net8.0\webBotica2.sourcelink.json
