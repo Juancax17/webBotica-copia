@@ -22,7 +22,9 @@ namespace webBotica2.Controllers
         public async Task<IActionResult> Index()
         { 
             
-            return View(await _context.Rols.ToListAsync());
+            return View(await _context.Rols.OrderByDescending(c => c.Estado)
+                .ThenBy(c => c.Rol1)
+                .ToListAsync());
         }
 
         
@@ -41,7 +43,7 @@ namespace webBotica2.Controllers
         {
             if (ModelState.IsValid)
             {
-                bool rolExiste = _context.Rols.Any(r => r.Rol1.ToLower() == rol.Rol1.ToLower());
+                bool rolExiste = _context.Rols.Any(r => r.Rol1.ToLower().Trim() == rol.Rol1.ToLower().Trim());
 
                 if (rolExiste)
                 {
@@ -87,7 +89,7 @@ namespace webBotica2.Controllers
             {
                 try
                 {
-                    bool rolExiste = _context.Rols.Any(r => r.Rol1.ToLower() == rol.Rol1.ToLower() && r.IdRol != rol.IdRol);
+                    bool rolExiste = _context.Rols.Any(r => r.Rol1.ToLower().Trim() == rol.Rol1.ToLower().Trim() && r.IdRol != rol.IdRol);
 
                     if (rolExiste)
                     {
@@ -139,10 +141,11 @@ namespace webBotica2.Controllers
             var rol = await _context.Rols.FindAsync(id);
             if (rol != null)
             {
-                rol.Estado = false;
+                rol.Estado = !rol.Estado;
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
+            
             return RedirectToAction(nameof(Index));
         }
 

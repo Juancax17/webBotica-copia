@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
-using webBotica2.Models;
-
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Rotativa.AspNetCore;
+using System;
+using System.Configuration;
 using webBotica2.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,9 +21,7 @@ builder.Services.AddSession();
 
 // 3. EF Core
 builder.Services.AddDbContext<MiAngelitoContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("MiAngelito") ??
-        "Server=.;Database=MiAngelito;Trusted_Connection=True;TrustServerCertificate=True;"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 4. Autenticación por cookies
 builder.Services
@@ -40,7 +38,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
-
+RotativaConfiguration.Setup(app.Environment.WebRootPath, "Rotativa");
 
 // ─────────────── Pipeline ───────────────
 if (!app.Environment.IsDevelopment())

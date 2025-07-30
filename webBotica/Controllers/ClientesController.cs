@@ -21,7 +21,10 @@ namespace webBotica.Controllers
         // GET: Clientes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Clientes.ToListAsync());
+             return View(await _context.Clientes
+                .OrderByDescending(c => c.Estado) 
+                .ThenBy(c => c.Nombre)            
+                .ToListAsync());
         }
 
        
@@ -41,9 +44,32 @@ namespace webBotica.Controllers
         {
             if (ModelState.IsValid)
             {
+                var hoy = DateOnly.FromDateTime(DateTime.Today);
+                var fechaLimite = hoy.AddYears(-18);
+                var fechaLimite2 = hoy.AddYears(-100);
+
+                if (cliente.FechaNac > fechaLimite)
+                {
+                    ModelState.AddModelError("FechaNac", "El cliente debe ser mayor de 18 años.");
+                    return View(cliente);
+                } else if (cliente.FechaNac < fechaLimite2)
+                {
+                    ModelState.AddModelError("FechaNac", "La fecha de nacimiento no es creible");
+                    return View(cliente);
+                }
+
+                    bool ExistCli = await _context.Clientes.AnyAsync(r => r.Documento == cliente.Documento);
+
+                if (ExistCli)
+                {
+                    ModelState.AddModelError("Documento", "El Documento ya se encuentra registrado");
+                    return View(cliente); 
+                }
+               
                 _context.Add(cliente);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+
             }
             return View(cliente);
         }
@@ -80,6 +106,30 @@ namespace webBotica.Controllers
             {
                 try
                 {
+                    var hoy = DateOnly.FromDateTime(DateTime.Today);
+                    var fechaLimite = hoy.AddYears(-18);
+                    var fechaLimite2 = hoy.AddYears(-100);
+
+                    if (cliente.FechaNac > fechaLimite)
+                    {
+                        ModelState.AddModelError("FechaNac", "El cliente debe ser mayor de 18 años.");
+                        return View(cliente);
+                    }
+                    else if (cliente.FechaNac < fechaLimite2)
+                    {
+                        ModelState.AddModelError("FechaNac", "La fecha de nacimiento no es creíble");
+                        return View(cliente);
+                    }
+
+                    bool ExistCli = await _context.Clientes
+                        .AnyAsync(r => r.Documento == cliente.Documento && r.IdCliente != cliente.IdCliente);
+
+                    if (ExistCli)
+                    {
+                        ModelState.AddModelError("Documento", "El Documento ya se encuentra registrado");
+                        return View(cliente);
+                    }
+
                     _context.Update(cliente);
                     await _context.SaveChangesAsync();
                 }
@@ -99,23 +149,6 @@ namespace webBotica.Controllers
             return View(cliente);
         }
 
-        // GET: Clientes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var cliente = await _context.Clientes
-                .FirstOrDefaultAsync(m => m.IdCliente == id);
-            if (cliente == null)
-            {
-                return NotFound();
-            }
-
-            return View(cliente);
-        }
 
         // POST: Clientes/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -125,10 +158,11 @@ namespace webBotica.Controllers
             var cliente = await _context.Clientes.FindAsync(id);
             if (cliente != null)
             {
-                _context.Clientes.Remove(cliente);
+                cliente.Estado = !cliente.Estado;
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
+           
             return RedirectToAction(nameof(Index));
         }
 

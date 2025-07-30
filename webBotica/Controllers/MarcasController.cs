@@ -21,7 +21,9 @@ namespace webBotica2.Controllers
         // GET: Marcas
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Marcas.ToListAsync());
+            return View(await _context.Marcas.OrderByDescending(c => c.Estado)
+        .ThenBy(c => c.Nombre)
+        .ToListAsync());
         }
 
         
@@ -41,7 +43,7 @@ namespace webBotica2.Controllers
         {
             if (ModelState.IsValid)
             {
-                bool ExisteMarca = _context.Marcas.Any(m=> m.Nombre.ToLower() == marca.Nombre.ToLower());
+                bool ExisteMarca = _context.Marcas.Any(m=> m.Nombre.ToLower().Trim() == marca.Nombre.ToLower().Trim());
                 
                 if (ExisteMarca)
                 {
@@ -87,7 +89,7 @@ namespace webBotica2.Controllers
             {
                 try
                 {
-                    bool ExisteMarca = _context.Marcas.Any(m => m.Nombre.ToLower() == marca.Nombre.ToLower() && m.IdMarca !=marca.IdMarca);
+                    bool ExisteMarca = _context.Marcas.Any(m => m.Nombre.ToLower().Trim() == marca.Nombre.ToLower().Trim() && m.IdMarca !=marca.IdMarca);
 
                     if (ExisteMarca)
                     {
@@ -139,10 +141,11 @@ namespace webBotica2.Controllers
             var marca = await _context.Marcas.FindAsync(id);
             if (marca != null)
             {
-                marca.Estado= false;
+                marca.Estado = !marca.Estado;
+
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
